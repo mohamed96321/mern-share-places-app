@@ -17,7 +17,7 @@ const DUMMY_PLACES = [
   },
   {
     id: 'p2',
-    title: 'Empire State Building',
+    title: 'Freedom State In USA',
     description: 'One of the most famous sky scrapers in the world!',
     imageUrl: 'https://luxurycolumnist.com/wp-content/uploads/2022/02/machu-picchu-peru.jpg',
     address: '20 W 34th St, New York, NY 10001',

@@ -5,6 +5,7 @@ import Button from "../../../shared/components/FormElements/Button/Button";
 import { VALIDATOR_REQUIRE, VALIDATOR_MINLENGTH } from '../../../shared/util/validators';
 import { useForm } from '../../../shared/hooks/form-hook';
 import '../NewPlace/PlaceForm.css'
+import Card from "../../../shared/components/UIElements/Card/Card";
 
 const DUMMY_PLACES = [
   {
@@ -21,7 +22,7 @@ const DUMMY_PLACES = [
   },
   {
     id: 'p2',
-    title: 'Empire State Building',
+    title: 'Freedom State In USA',
     description: 'One of the most famous sky scrapers in the world!',
     imageUrl: 'https://luxurycolumnist.com/wp-content/uploads/2022/02/machu-picchu-peru.jpg',
     address: '20 W 34th St, New York, NY 10001',
@@ -53,18 +54,20 @@ const UpdatePlace = () => {
   const identifiedPlace = DUMMY_PLACES.find(p => p.id === placeId);
 
   useEffect(() => {
-    setFormData({
-      title: {
-        value: identifiedPlace.title,
-        isValid: true
-      },
-      description: {
-        value: identifiedPlace.description,
-        isValid: true
-      }
-    }, 
-    true
-    ); 
+    if (identifiedPlace) {
+      setFormData({
+        title: {
+          value: identifiedPlace.title,
+          isValid: true
+        },
+        description: {
+          value: identifiedPlace.description,
+          isValid: true
+        }
+      }, 
+      true
+      ); 
+    }
     setIsLoading(false); 
   }, [setFormData, identifiedPlace]);
 
@@ -76,7 +79,9 @@ const UpdatePlace = () => {
   if (!identifiedPlace) {
     return (
       <div className="centered">
-        <h3>Could Not Find Any Place!</h3>
+        <Card>
+          <h3>Could Not Find Any Place!</h3>
+        </Card>
       </div>
     );
   }
@@ -84,7 +89,9 @@ const UpdatePlace = () => {
   if (isLoading) {
     return (
       <div className="centered">
-        <h3>Loading...</h3>
+        <Card>
+          <h3>Loading...</h3>
+        </Card>
       </div>
     );
   }
