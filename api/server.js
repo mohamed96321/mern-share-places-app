@@ -1,12 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { v4: uuidv4 } = require('uuid');
+const mongoose = require('mongoose');
+
+const placesRoutes = require('./routes/places-routes');
+const usersRoutes = require('./routes/users-routes');
+const HttpError = require('./models/http-error');
 
 const app = express();
 
-const DUMMY_PRODUCTS = []; // not a database, just some in-memory storage for now
-
 app.use(bodyParser.json());
+
+app.use('/api/places', placesRoutes); // => /api/places
+app.use('/api/users', usersRoutes);
+
+app.use((req, res, next) => {
+  const error = new HttpError('Could not find this page.', 404);
+  throw error;
+});
 
 // CORS Headers => Required for cross-origin/ cross-server communication
 app.use((req, res, next) => {
@@ -22,30 +32,21 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/products', (req, res, next) => {
-  res.status(200).json({ products: DUMMY_PRODUCTS });
-});
-
-app.post('/product', (req, res, next) => {
-  const { title, price } = req.body;
-
-  if (!title || title.trim().length === 0 || !price || price <= 0) {
-    return res.status(422).json({
-      message: 'Invalid input, please enter a valid title and price.'
-    });
+app.use((error, req, res, next) => {
+  if (res.headerSent) {
+    return next(error);
   }
-
-  const createdProduct = {
-    id: uuidv4(),
-    title,
-    price
-  };
-
-  DUMMY_PRODUCTS.push(createdProduct);
-
-  res
-    .status(201)
-    .json({ message: 'Created new product.', product: createdProduct });
+  res.status(error.code || 500);
+  res.json(({ message: error.message || 'An unknown error occurred.' }));
 });
 
-app.listen(5000); // start Node + Express server on port 5000
+// start Node + Express server on port 5000
+mongoose.connect(
+  'mongodb+srv://mohamedatef556:Mohamed96321Atef@cluster0.pponlh5.mongodb.net/sharehub?retryWrites=true&w=majority')
+  .then(result => {
+    console.log("Database is connected successfully");
+    app.listen(5000);
+  })
+  .catch(err => {
+    console.log(err);
+  })
