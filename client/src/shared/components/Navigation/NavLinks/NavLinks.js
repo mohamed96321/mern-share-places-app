@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { NavLink } from 'react-router-dom';
 import { AuthContext } from "../../../context/auth-context";
 import './NavLinks.css'
-import { Button } from "@mui/material";
 
 const NavLinks = props => {
   const auth = useContext(AuthContext);
@@ -29,7 +28,7 @@ const NavLinks = props => {
       )}
       {auth.isLoggedIn && (
         <li>
-          <Button inverse="true" onClick={auth.logout}>LOG OUT</Button>
+          <button inverse="true" onClick={auth.logout}>LOG OUT</button>
         </li>
       )}
     </ul>

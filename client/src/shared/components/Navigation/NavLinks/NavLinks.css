@@ -14,6 +14,10 @@
   margin: 1rem;
 }
 
+.nav-links li button {
+  border-color: #2F5D62;
+}
+
 .nav-links a {
   border: 1px solid transparent;
   color: #292929;

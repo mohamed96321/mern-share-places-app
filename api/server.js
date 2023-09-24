@@ -10,14 +10,6 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.use('/api/places', placesRoutes); // => /api/places
-app.use('/api/users', usersRoutes);
-
-app.use((req, res, next) => {
-  const error = new HttpError('Could not find this page.', 404);
-  throw error;
-});
-
 // CORS Headers => Required for cross-origin/ cross-server communication
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -32,6 +24,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api/places', placesRoutes); // => /api/places
+app.use('/api/users', usersRoutes);
+
+app.use((req, res, next) => {
+  const error = new HttpError('Could not find this page.', 404);
+  throw error;
+});
+
 app.use((error, req, res, next) => {
   if (res.headerSent) {
     return next(error);
@@ -44,7 +44,7 @@ app.use((error, req, res, next) => {
 mongoose.connect(
   'mongodb+srv://mohamedatef556:Mohamed96321Atef@cluster0.pponlh5.mongodb.net/sharehub?retryWrites=true&w=majority')
   .then(result => {
-    console.log("Database is connected successfully");
+    console.log("Database is connected with PORT 5000");
     app.listen(5000);
   })
   .catch(err => {
