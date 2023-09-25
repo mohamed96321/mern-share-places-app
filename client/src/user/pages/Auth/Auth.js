@@ -1,8 +1,13 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext } from 'react';
+
 import Card from "../../../shared/components/UIElements/Card/Card";
 import Input from "../../../shared/components/FormElements/Input/Input";
 import Button from "../../../shared/components/FormElements/Button/Button";
-import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../../shared/util/validators';
+import ImageUpload from "../../../shared/components/FormElements/ImageUpload/ImageUpload";
+import { 
+  VALIDATOR_EMAIL, 
+  VALIDATOR_MINLENGTH, 
+  VALIDATOR_REQUIRE } from '../../../shared/util/validators';
 import { useForm } from "../../../shared/hooks/form-hook";
 import { useHttpClient } from "../../../shared/hooks/http-hooks";
 import { AuthContext } from "../../../shared/context/auth-context";
@@ -13,59 +18,60 @@ import './Auth.css';
 const Auth = () => {
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
-
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
-  const [formState, inputHandler, setFormData] = useForm({
-    email: {
-      value: '',
-      isValid: false
+  const [formState, inputHandler, setFormData] = useForm(
+    {
+      email: {
+        value: '',
+        isValid: false
+      },
+      password: {
+        value: '',
+        isValid: false
+      }
     },
-    password: {
-      value: '',
-      isValid: false
-    }
-  }, false);
+    false
+  );
 
   const switchModeHandler = () => {
     if (!isLoginMode) {
-      setFormData({
-        ...formState.inputs,
-        name: undefined
-      }, formState.inputs.email.isValid && formState.inputs.password.isValid);
+      setFormData(
+        {
+          ...formState.inputs,
+          name: undefined,
+          image: undefined
+        },
+        formState.inputs.email.isValid && formState.inputs.password.isValid
+      );
     } else {
-      setFormData({
-        ...formState.inputs,
-        name: {
-          value: '',
-          isValid: false
-        }
-      }, false);
+      setFormData(
+        {
+          ...formState.inputs,
+          name: {
+            value: '',
+            isValid: false
+          },
+          image: {
+            value: null,
+            isValid: false
+          }
+        },
+        false
+      );
     }
     setIsLoginMode(prevMode => !prevMode);
   };
 
   const authSubmitHandler = async event => {
     event.preventDefault();
-    
+
     if (isLoginMode) {
       try {
-        const responseData = await sendRequest('http://localhost:5000/api/users/login', 'POST',
+        const responseData = await sendRequest(
+          'http://localhost:5000/api/users/login',
+          'POST',
           JSON.stringify({
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value
-          }),
-          {
-            'Content-Type': 'application/json'
-          }
-        ); 
-        auth.login(responseData.user.id);
-      } catch (err) {}
-    } else {
-      try {
-        const responseData = await sendRequest('http://localhost:5000/api/users/signup', 'POST',
-          JSON.stringify({
-            name: formState.inputs.name.value,
             email: formState.inputs.email.value,
             password: formState.inputs.password.value
           }),
@@ -73,7 +79,21 @@ const Auth = () => {
             'Content-Type': 'application/json'
           }
         );
-        
+        auth.login(responseData.user.id);
+      } catch (err) {}
+    } else {
+      try {
+        const formData = new FormData();
+        formData.append('email', formState.inputs.email.value);
+        formData.append('name', formState.inputs.name.value);
+        formData.append('password', formState.inputs.password.value);
+        formData.append('image', formState.inputs.image.value);
+        const responseData = await sendRequest(
+          'http://localhost:5000/api/users/signup',
+          'POST',
+          formData
+        );
+
         auth.login(responseData.user.id);
       } catch (err) {}
     }
@@ -85,45 +105,53 @@ const Auth = () => {
       <Card className="auth">
         {isLoading && <LoadingSpinner asOverlay />}
         <h2>
-          {isLoginMode ? 'ShareHub Log In' : 'ShareHub Sign Up'}
+          {isLoginMode ? 'Log In to ShareHub' : 'Sign Up to ShareHub'}
         </h2>
         <hr />
         <form onSubmit={authSubmitHandler}>
           {!isLoginMode && (
-          <Input 
-            id="name" 
-            element="input" 
-            type="text" 
-            label="FullName" 
-            validators={[VALIDATOR_REQUIRE()]} 
-            errorText="Please enter a your name."
-            onInput={inputHandler} 
+            <Input
+              element="input"
+              id="name"
+              type="text"
+              label="Your Name"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Please enter a name."
+              onInput={inputHandler}
             />
           )}
-          <Input 
-            id="email" 
-            element="input" 
-            type="email" 
-            label="Email" 
-            validators={[VALIDATOR_EMAIL()]} 
-            errorText="Please enter a valid email."
+          {!isLoginMode && (
+            <ImageUpload
+              center
+              id="image"
+              onInput={inputHandler}
+              errorText=""
+            />
+          )}
+          <Input
+            element="input"
+            id="email"
+            type="email"
+            label="E-Mail"
+            validators={[VALIDATOR_EMAIL()]}
+            errorText="Please enter a valid email address."
             onInput={inputHandler}
           />
-          <Input 
-            id="password" 
-            element="input" 
-            type="password" 
-            label="Password" 
-            validators={[VALIDATOR_MINLENGTH(5)]} 
-            errorText="Please enter a strong password, at least 5 characters."
+          <Input
+            element="input"
+            id="password"
+            type="password"
+            label="Password"
+            validators={[VALIDATOR_MINLENGTH(6)]}
+            errorText="Please enter a valid password, at least 6 characters."
             onInput={inputHandler}
           />
           <Button type="submit" disabled={!formState.isValid}>
-            {isLoginMode ? 'LOG IN' : 'SIGN UP'}
+            {isLoginMode ? 'LOGIN' : 'SIGNUP'}
           </Button>
         </form>
         <Button inverse onClick={switchModeHandler}>
-          {isLoginMode ? 'CREATE ACCOUNT' : 'LOG IN'}
+          {isLoginMode ? 'CREATE ACCOUNT' : 'LOGIN'}
         </Button>
       </Card>
     </React.Fragment>
