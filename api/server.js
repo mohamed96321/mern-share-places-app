@@ -40,7 +40,7 @@ app.use((req, res, next) => {
 app.use((error, req, res, next) => {
   if (req.file) {
     fs.unlink(req.file.path, err => {
-      console.log('Email already exists!' + err);
+      console.log('Email already exists!');
     });
   }
   if (res.headerSent) {

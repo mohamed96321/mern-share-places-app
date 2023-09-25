@@ -53,7 +53,9 @@ const NewPlace = () => {
       await sendRequest(
         'http://localhost:5000/api/places', 
         'POST', 
-        formData
+        formData, {
+          Authorization: 'Bearer ' + auth.token
+        }
       );
       // Redirect the user to a different page
       histroy.push('/');
